@@ -13,20 +13,30 @@
 <body>
 
 <?php
-
+// Cria uma instância da classe SQLite3 com o banco de dados do arquivo 
+//banco_de_dados.db
 $db = new SQLite3('banco_de_dados.db');
+// Tenta criar a tabela caso não exista. Para acessar atributos e métodos de um 
+//objeto no PHP use ->
 $db->query('CREATE TABLE IF NOT EXISTS itens (chave varchar(100), valor varchar(100))');
-#$db::query
 
+// Testa se na váriavel global $_SERVER o item da lista referente ao método HTTP
+//usado está definido como POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+	// Recupera os dados transferidos via formulário
 	$chave = $_POST['chave'];
 	$valor = $_POST['valor'];
+	// Prepara uma string para ser enviada ao banco de dados, protegendo contra
+	//SQLInjection e outras falhas comuns ao concatenar strings
 	$inserir = $db->prepare('INSERT INTO itens (chave, valor) VALUES (:chave, :valor)');
+	// Define os valores a serem usados na string preparada
 	$inserir->bindParam(':chave', $chave);
 	$inserir->bindParam(':valor', $valor);
+	// Envia e executa a string preparada no banco de dados
 	$inserir->execute();
 }
 
+// Retorna todos os itens cadastrados no banco de dados
 $itens = $db->query('SELECT * FROM itens');
 
 ?>
